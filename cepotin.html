@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blogger API Post</title>
+</head>
+<body>
+    <form action="" method="post">
+        <label for="blogid">Blog ID:</label>
+        <input type="text" id="blogid" name="blogid" required><br>
+
+        <label for="token">Token:</label>
+        <input type="text" id="token" name="token" required><br>
+
+        <label for="tanggal">Start Date:</label>
+        <input type="date" id="tanggal" name="tanggal" required><br>
+
+        <label for="name">Title:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="label">Labels:</label>
+        <input type="text" id="label" name="label" required><br>
+
+        <label for="postingan">Content:</label>
+        <textarea id="postingan" name="postingan" required></textarea><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <?php
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        date_default_timezone_set('Europe/London');
+
+        $blogID = $_POST["blogid"];
+        $token = $_POST["token"];
+        $start_date = $_POST["tanggal"];
+        $judul = $_POST["name"];
+        $tag = $_POST["label"];
+        $isi = $_POST["postingan"];
+
+        $postData = array(
+            'kind' => 'blogger#post',
+            'blog' => array(
+                'id' => $blogID
+            ),
+            'title' => $judul,
+            'labels' => array($tag),
+            'published' => date('Y-m-d\TH:i:sP', strtotime($start_date)),
+            'content' => $isi
+        );
+
+        $ch = curl_init('https://www.googleapis.com/blogger/v3/blogs/' . $blogID . '/posts/');
+        curl_setopt_array($ch, array(
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer ' . $token,
+                'Content-Type: application/json'
+            ),
+            CURLOPT_POSTFIELDS => json_encode($postData)
+        ));
+        $response = curl_exec($ch);
+
+        if ($response === false) {
+            die(curl_error($ch));
+        }
+
+        echo $response;
+        $responseData = json_decode($response, true);
+        echo $responseData['published'];
+
+        if (isset($judul)) {
+            echo '<script type="text/javascript">
+                setTimeout(function(){
+                    window.location = "https://HatefulMellowSnake.afdgfggfhgfhjh.repl.co";
+                }, 6000);
+            </script>';
+        }
+    }
+    ?>
+</body>
+</html>
